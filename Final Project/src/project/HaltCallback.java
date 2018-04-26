@@ -1,5 +1,5 @@
 package project;
 
-public Interface HaltCallback(){
+public interface HaltCallback{
   abstract void halt();
 }
