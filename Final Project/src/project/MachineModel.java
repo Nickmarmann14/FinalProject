@@ -97,7 +97,7 @@ public class MachineModel{
     });
   }
   private class cpu{
-    private int accuulator;
+    private int accumulator;
     private int instructionPointer;
     private int memoryBase;
     
