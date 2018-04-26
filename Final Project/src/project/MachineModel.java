@@ -42,14 +42,14 @@ public class MachineModel{
     });
     //INSTRUCTION_MAP entry for "SUB"
     INSTRUCTIONS.put(0x10,arg -> {
-      int arg1 = memory.getData(cpu.memoryBase-arg);
+      int arg1 = memory.getData(cpu.memoryBase+arg);
       cpu.accumulator-=arg1;
       cpu.incrementIP(1);
     });
     //INSTRUCTION_MAP entry for "SUBN"
     INSTRUCTIONS.put(0x11,arg -> {
-      int arg1 = memory.getData(cpu.memoryBase-arg);
-      int arg2 = memory.getData(cpu.memoryBase-arg1);
+      int arg1 = memory.getData(cpu.memoryBase+arg);
+      int arg2 = memory.getData(cpu.memoryBase+arg1);
       cpu.accumulator-=arg2;
       cpu.incrementIP(1);
     });
@@ -60,14 +60,14 @@ public class MachineModel{
     });
     //INSTRUCTION_MAP entry for "MUL"
     INSTRUCTIONS.put(0x13, arg -> {
-      int arg1 = memory.geData(cpu.memoryBase*arg);
+      int arg1 = memory.geData(cpu.memoryBase+arg);
       cpu.accumulator *= arg1;
       cpu.incrementIP(1);
     });
     //INSTRUCTIONS_MAP entry for "MULN"
     INSTRUCTIONS.put(0x14, arg -> {
-    	int arg1 = memory.getData(cpu.memoryBase*arg);
-	int arg2 = memory.getData(cpu.memoryBase*arg1);
+    	int arg1 = memory.getData(cpu.memoryBase+arg);
+	int arg2 = memory.getData(cpu.memoryBase+arg1);
 	cpu.accumulator *= arg2;
 	cpu.increment(1);
     });
@@ -82,7 +82,7 @@ public class MachineModel{
     INSTRUCTIONS.put(0x16, arg -> {
     	if(arg == 0)
 		throw new DivideByZeroException("Cannot divide by zero");
-	int arg1 = memory.getData(cpu.memoryBase/arg);
+	int arg1 = memory.getData(cpu.memoryBase+arg);
 	cpu.accumulator /= arg1;
 	cpu.increment(1);
     });
@@ -90,8 +90,8 @@ public class MachineModel{
     INSTRUCTIONS.put(0x17, arg -> {
     	if(arg == 0)
 		throw new DivideByZeroException("Cannot divide by zero");
-	int arg1 = memory.getData(cpu.memoryBase/arg);
-	int arg2 = memory.getData(cpu.memoryBase/arg1);
+	int arg1 = memory.getData(cpu.memoryBase+arg);
+	int arg2 = memory.getData(cpu.memoryBase+arg1);
 	cpu.accumulator /= arg2;
 	cpu.increment(1);
     });
