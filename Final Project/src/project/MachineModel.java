@@ -10,6 +10,8 @@ public class MachineModel{
 	private Memory memory = new Memory();
 	private HaltCallback callback;
 	private boolean withGUI;
+	private Job[] jobs = new Job[2]; // Jobs will hold the state of the current program that's executing.
+	private Job currentJob; 
 
 	public MachineModel() {
 		this(false, null);
@@ -132,6 +134,26 @@ public class MachineModel{
 			CPU.accumulator /= arg2;
 			CPU.incrementIP(1);
 		});
+		
+	}
+	public Job getCurrentJob() {
+		return currentJob;
+	}
+	public void setJob(int i) {
+		if(i!=0 || i!=1){
+			throw new IllegalArgumentException("Input must be either 1 or 0!");
+		}
+		currentJob = jobs[i];
+		CPU.accumulator = currentJob.getCurrentAcc();
+		CPU.instructionPointer = currentJob.getCurrentIP();
+		CPU.memoryBase = currentJob.getStartmemoryIndex();
+	}
+	
+	public void setCurrentAcc(){
+		currentJob.setCurrentAcc(CPU.accumulator);
+	}
+	public void setCurrentIP(){
+		currentJob.setCurrentIP(CPU.instructionPointer);
 	}
 	private class cpu{
 		private int accumulator;
