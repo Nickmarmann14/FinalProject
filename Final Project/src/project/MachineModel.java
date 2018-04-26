@@ -16,7 +16,43 @@ public class MachineModel{
   public MachineModel(boolean GUI, HaltCallback cb){
     withGui = GUI;
     callback = cb;
-    
+    //INSTRUCTION_MAP entry for "NOP"
+    INSTRUCTIONS.put(0x0, arg -> {
+    	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "LODI"
+    INSTRUCTIONS.put(0x1, arg -> {
+    	cpu.accumulator = arg;
+	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "LOD"
+    INSTRUCTIONS.put(0x2, arg -> {
+    	int ar1 = memory.getData(cpu.memoryBase+arg);
+	cpu.accumulator = arg1;
+	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "LODN"
+    INSTRUCTIONS.put(0x3, arg -> {
+    	int arg1 = memory.getData(cpu.memoryBase+arg);
+	int arg2 = memory.getData(cpu.memoryBase+arg1);
+	cpu.accumulator = arg2;
+	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "STO"
+    INSTRUCTIONS.put(0x4 -> arg {
+    	memory.setData(cpu.memoryBase+arg, cpu.accumulator);
+	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "STON"
+    INSTRUCTIONS.put(0x5 -> arg {
+    	int arg1 = memory.getData(cpu.memoryBase+arg);
+	int arg2 = memory.setData(cpu.memoryBase+arg1, cpu.accumulator);
+	cpu.incrementIP(1);
+    });
+    //INSTRUCTION_MAP entry for "JMPR"
+    INSTRUCTIONS.put(0x6 -> arg {
+  	
+    });
     //INSTRUCTION_MAP entry for "ADDI"
     INSTRUCTIONS.put(0xC, arg -> {
       cpu.accumulator += arg;
