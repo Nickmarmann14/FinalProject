@@ -3,6 +3,8 @@ package project;
 import java.util.Map;
 import java.util.TreeMap;
 
+import projectview.States;
+
 public class MachineModel{
 
 	public static final Map<Integer, Instruction>INSTRUCTIONS = new TreeMap<Integer, Instruction>();
@@ -56,6 +58,9 @@ public class MachineModel{
 		//    INSTRUCTIONS.put(0x6 -> arg {
 		//  	
 		//    });
+		
+		//The piazza says there will need to be modifications for JumpI and Jmpzi, so if you're getting errors there don't worry about them just yet.
+		
 		//INSTRUCTION_MAP entry for "ADDI"
 		INSTRUCTIONS.put(0xC, arg -> {
 			CPU.accumulator += arg;
@@ -135,6 +140,15 @@ public class MachineModel{
 			CPU.incrementIP(1);
 		});
 		
+		jobs[0] = new Job();
+		jobs[1] = new Job();
+		currentJob = jobs[0];
+		jobs[0].setStartcodeIndex(0);
+		jobs[0].setStartmemoryIndex(0);
+		jobs[0].setCurrentState(States.NOTHING_LOADED);
+		jobs[1].setStartcodeIndex(Memory.CODE_MAX/4);
+		jobs[1].setStartmemoryIndex(Memory.DATA_SIZE/2);
+		jobs[1].setCurrentState(States.NOTHING_LOADED);
 	}
 	public Job getCurrentJob() {
 		return currentJob;
