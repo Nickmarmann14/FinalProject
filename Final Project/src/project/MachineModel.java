@@ -169,6 +169,58 @@ public class MachineModel{
 	public void setCurrentIP(){
 		currentJob.setCurrentIP(CPU.instructionPointer);
 	}
+	
+	public Instruction get(int key) {
+		return INSTRUCTIONS.get(key);
+	}
+	
+	public int getInstructionPointer() {
+		return CPU.instructionPointer;
+	}
+	
+	public int getAccumulator() {
+		return CPU.accumulator;
+	}
+	
+	public int getMemoryBase() {
+		return CPU.memoryBase;
+	}
+	
+	public void setInstructionPointer(int i) {
+		CPU.instructionPointer = i;
+	}
+	
+	public void setAccumulator(int i) {
+		CPU.accumulator = i;
+	}
+	
+	public void setMemoryBase(int i) {
+		CPU.memoryBase = i;
+	}
+	
+	public void clearJob() {
+		memory.clearData(currentJob.getStartmemoryIndex(), currentJob.getStartmemoryIndex()+Memory.DATA_SIZE/2);
+		memory.clear(currentJob.getStartmemoryIndex(), currentJob.getStartcodeIndex()+currentJob.getCodeSize());
+		CPU.accumulator = 0;
+		CPU.instructionPointer = currentJob.getStartcodeIndex();
+		currentJob.reset();
+	}
+	
+	public void step() {
+		try {
+			if(CPU.instructionPointer<currentJob.getStartcodeIndex() || CPU.instructionPointer >= currentJob.getStartcodeIndex() + currentJob.getCodeSize()) {
+				throw new CodeAccessException("The code you are trying to access is out of range!");
+			}
+			
+			get(memory.getOp(CPU.instructionPointer)).execute(memory.getArg(CPU.instructionPointer));
+			
+			
+		} catch(Exception e) {
+			callback.halt();
+			throw e;
+		}
+	}
+	
 	private class cpu{
 		private int accumulator;
 		private int instructionPointer;
