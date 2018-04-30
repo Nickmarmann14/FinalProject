@@ -6,7 +6,7 @@ public class Memory {
 	private int[] data = new int[DATA_SIZE];
 	private int changedIndex = -1;
 	
-	private int[] getAllData() {
+	protected int[] getAllData() {
 		return data;
 	}
 	
