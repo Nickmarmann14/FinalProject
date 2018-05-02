@@ -227,6 +227,16 @@ public class MachineModel{
 	public void setData(int index, int value) {
 		memory.setData(index, value);
 	}
+	
+	public int getOp(int i) {
+		return memory.getOp(i);
+	}
+	public int getArg(int i) {
+		return memory.getArg(i);
+	}
+	public void setCode(int index, int op, int arg) {
+		memory.setCode(index, op, arg);
+	}
 	public void setJob(int i) {
 		if(i!=0 || i!=1){
 			throw new IllegalArgumentException("Input must be either 1 or 0!");

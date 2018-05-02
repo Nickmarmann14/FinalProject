@@ -52,4 +52,5 @@ public class Memory {
 		code[2*index] = op;
 		code[2*index+1] = arg;
 	}
+	
 }

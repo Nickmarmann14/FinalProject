@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SimpleAssembler implements Assembler {
+	
 	private boolean readingCode = true;
+	
 	private String makeOutputCode(String[] parts) {
 		if(parts.length==1)
 			return InstrMap.toCode.get(parts[0]) + "\n" + 0;
