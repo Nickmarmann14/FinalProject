@@ -222,6 +222,13 @@ public class MachineModel{
 		jobs[1].setStartmemoryIndex(Memory.DATA_SIZE/2);
 		jobs[1].setCurrentState(States.NOTHING_LOADED);
 	}
+
+	public String getHex(int i){
+		return memory.getHex(i);
+	}
+	public String getDecimal(int i){
+		return memory.getDecimal(i);
+	}
 	public int[] getData() {
 		return memory.getAllData();
 	}
