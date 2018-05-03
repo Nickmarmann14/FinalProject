@@ -54,35 +54,39 @@ public class MachineModel{
 			memory.setData(cpu.memoryBase+arg1, cpu.accumulator);
 			cpu.incrementIP();
 		});
-	    //INSTRUCTION_MAP entry for "JMPR"
-	    INSTRUCTIONS.put(0x6, arg -> {
-	    		cpu.instructionPointer=+arg;
+		//INSTRUCTION_MAP entry for "JMPR"
+		INSTRUCTIONS.put(0x6, arg -> {
+			cpu.instructionPointer=+arg;
 		});
-	    //INSTRUCTION_MAP entry for "JUMP"
-	    INSTRUCTIONS.put(0x7, arg -> {
-	    		cpu.instructionPointer=+(cpu.memoryBase+arg);
+		//INSTRUCTION_MAP entry for "JUMP"
+		INSTRUCTIONS.put(0x7, arg -> {
+			cpu.instructionPointer=+(cpu.memoryBase+arg);
 		});
-	    //INSTRUCTION_MAP entry for "JUMPI"
-	    INSTRUCTIONS.put(0x8, arg -> {
-	    		cpu.instructionPointer=arg;
+		//INSTRUCTION_MAP entry for "JUMPI"
+		INSTRUCTIONS.put(0x8, arg -> {
+			cpu.instructionPointer= currentJob.getStartcodeIndex() + arg;
+
 		});
-	    //INSTRUCTION_MAP entry for "JMPZR"
-	    INSTRUCTIONS.put(0x9, arg -> {
-	   		cpu.instructionPointer=+arg;
-	    		if(cpu.accumulator!=0)
-	    			cpu.incrementIP();
+		//INSTRUCTION_MAP entry for "JMPZR"
+		INSTRUCTIONS.put(0x9, arg -> {
+			cpu.instructionPointer=+arg;
+			if(cpu.accumulator!=0)
+				cpu.incrementIP();
 		});
-	    //INSTRUCTION_MAP entry for "JMPZ"
-	    INSTRUCTIONS.put(0xA, arg -> {
-	    		cpu.instructionPointer=+(cpu.memoryBase+arg);
-	    		if(cpu.accumulator!=0)
-	    			cpu.incrementIP();
+		//INSTRUCTION_MAP entry for "JMPZ"
+		INSTRUCTIONS.put(0xA, arg -> {
+			cpu.instructionPointer=+(cpu.memoryBase+arg);
+			if(cpu.accumulator!=0)
+				cpu.incrementIP();
 		});
-	    //INSTRUCTION_MAP entry for "JMPZI"
-	    INSTRUCTIONS.put(0xB, arg -> {
-	    		cpu.instructionPointer=arg;
-	    		if(cpu.accumulator!=0)	
-	    			cpu.incrementIP();
+		//INSTRUCTION_MAP entry for "JMPZI"
+		INSTRUCTIONS.put(0xB, arg -> {
+			if(cpu.accumulator!=0) {	
+				cpu.incrementIP();
+			}
+			else {
+				cpu.instructionPointer = currentJob.getStartcodeIndex() + arg;
+			}
 		});
 		//The piazza says there will need to be modifications for JumpI and Jmpzi, so if you're getting errors there don't worry about them just yet.
 		//INSTRUCTION_MAP entry for "ADDI"
@@ -207,7 +211,7 @@ public class MachineModel{
 		INSTRUCTIONS.put(0x1F, arg ->{
 			callback.halt();
 		});
-		
+
 		jobs[0] = new Job();
 		jobs[1] = new Job();
 		currentJob = jobs[0];
@@ -227,16 +231,36 @@ public class MachineModel{
 	public void setData(int index, int value) {
 		memory.setData(index, value);
 	}
-	
+
+	public int getChangedIndex() {
+		return memory.getChangedIndex();
+	}
+
+	public int[] getCode() {
+		return memory.getCode();
+	}
+	public void setCode(int index, int op, int arg) {
+		memory.setCode(index, op, arg);
+	}
 	public int getOp(int i) {
 		return memory.getOp(i);
 	}
 	public int getArg(int i) {
 		return memory.getArg(i);
 	}
-	public void setCode(int index, int op, int arg) {
-		memory.setCode(index, op, arg);
+
+	public Job getCurrentJob() {
+		return currentJob;
 	}
+
+	public States getCurrentState() {
+		return currentJob.getCurrentState();
+	}
+
+	public void setCurrentState(States currentState) {
+		currentJob.setCurrentState(currentState);
+	}
+
 	public void setJob(int i) {
 		if(i!=0 || i!=1){
 			throw new IllegalArgumentException("Input must be either 1 or 0!");
@@ -246,42 +270,42 @@ public class MachineModel{
 		cpu.instructionPointer = currentJob.getCurrentIP();
 		cpu.memoryBase = currentJob.getStartmemoryIndex();
 	}
-	
+
 	public void setCurrentAcc(){
 		currentJob.setCurrentAcc(cpu.accumulator);
 	}
 	public void setCurrentIP(){
 		currentJob.setCurrentIP(cpu.instructionPointer);
 	}
-	
+
 	public Instruction get(int key) {
 		return INSTRUCTIONS.get(key);
 	}
-	
+
 	public int getInstructionPointer() {
 		return cpu.instructionPointer;
 	}
-	
+
 	public int getAccumulator() {
 		return cpu.accumulator;
 	}
-	
+
 	public int getMemoryBase() {
 		return cpu.memoryBase;
 	}
-	
+
 	public void setInstructionPointer(int i) {
 		cpu.instructionPointer = i;
 	}
-	
+
 	public void setAccumulator(int i) {
 		cpu.accumulator = i;
 	}
-	
+
 	public void setMemoryBase(int i) {
 		cpu.memoryBase = i;
 	}
-	
+
 	public void clearJob() {
 		memory.clearData(currentJob.getStartmemoryIndex(), currentJob.getStartmemoryIndex()+Memory.DATA_SIZE/2);
 		memory.clear(currentJob.getStartmemoryIndex(), currentJob.getStartcodeIndex()+currentJob.getCodeSize());
@@ -289,22 +313,22 @@ public class MachineModel{
 		cpu.instructionPointer = currentJob.getStartcodeIndex();
 		currentJob.reset();
 	}
-	
+
 	public void step() {
 		try {
 			if(cpu.instructionPointer<currentJob.getStartcodeIndex() || cpu.instructionPointer >= currentJob.getStartcodeIndex() + currentJob.getCodeSize()) {
 				throw new CodeAccessException("The code you are trying to access is out of range!");
 			}
-			
+
 			get(memory.getOp(cpu.instructionPointer)).execute(memory.getArg(cpu.instructionPointer));
-			
-			
+
+
 		} catch(Exception e) {
 			callback.halt();
 			throw e;
 		}
 	}
-	
+
 	private class CPU{
 		private int accumulator;
 		private int instructionPointer;

@@ -11,7 +11,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import project.Assembler;
 import project.Job;
+import project.Loader;
 import project.MachineModel;
 
 public class FilesManager {
