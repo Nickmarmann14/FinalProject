@@ -2,6 +2,7 @@ package projectview;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.Observable;
 import java.util.Observer;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -18,6 +19,15 @@ public class MenuBarBuilder implements Observer {
 
 	public MenuBarBuilder(ViewMediator gui) { 
 	     view = gui; gui.addObserver(this); 
+	}
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		assemble.setEnabled(view.getCurrentState().getAssembleFileActive());
+		load.setEnabled(view.getCurrentState().getLoadFileActive());
+		exit.setEnabled(true);
+		go.setEnabled(view.getCurrentState().getStepActive());
+		job0.setEnabled(view.getCurrentState().getChangeJobActive());
+		job1.setEnabled(view.getCurrentState().getChangeJobActive());
 	}
 	JMenu createFileMenu() {
 		JMenu menu = new JMenu("File");
@@ -63,4 +73,5 @@ public class MenuBarBuilder implements Observer {
 		menu.add(job1);
 		return menu;
 	}
+	
 }

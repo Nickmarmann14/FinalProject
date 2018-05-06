@@ -211,6 +211,11 @@ public class MachineModel{
 		INSTRUCTIONS.put(0x1F, arg ->{
 			callback.halt();
 		});
+		//INSTRUCTION_MAP entry for "JUMPN"
+		INSTRUCTIONS.put(29, arg -> {
+			int arg1 = memory.getData(cpu.memoryBase+arg);
+			cpu.instructionPointer = currentJob.getStartcodeIndex() + arg1;
+		});
 
 		jobs[0] = new Job();
 		jobs[1] = new Job();
