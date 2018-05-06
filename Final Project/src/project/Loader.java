@@ -47,8 +47,8 @@ public class Loader {
 					int val = parser.nextInt();
 					model.setData(i+memoryOffset, val);
 				}
-				input.close();
-			}
+				
+			}input.close();
 			return ""+codeSize;
 		}
 		catch(ArrayIndexOutOfBoundsException e) {
