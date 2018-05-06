@@ -1,0 +1,4 @@
+#File locations
+#Sun May 06 19:02:33 EDT 2018
+ExecutableDirectory=C\:/Users/nickmarmann14/Documents/School/Computer Science/140/Final Project/FinalProject/Final Project/Pippin Executables/
+SourceDirectory=C\:/Users/nickmarmann14/Documents/School/Computer Science/140/Final Project/FinalProject/Final Project/Pippin Source Files/
