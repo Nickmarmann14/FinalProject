@@ -28,28 +28,30 @@ public class FullAssembler implements Assembler {
 					}
 					blankFound = true;
 				}
-				if(nextLine.charAt(0)==' ' || nextLine.charAt(0)=='\t') {
-					nextLine = nextLine.trim();
-					error.append("\nBlank Start Error on line "+lineCounter); // Error 2
-					errorLine = lineCounter;
-				}
-				if(isCode) {
-					if(nextLine.trim().toUpperCase().equals("DATA")) {
-						if(!(nextLine.trim().equals("DATA"))) {
-							error.append("\n \"DATA\" must be uppercase! Line: "+lineCounter); // Part of 3
-							errorLine = lineCounter;
-						}
-						isCode = false;
-					}
-					else {
-						codeLines.add(nextLine);
-					}
-				} else {
-					if(nextLine.equals("DATA")) {
-						error.append("\nYou cannot have two lines with DATA: line "+lineCounter); // Error 3
+				else {
+					if(nextLine.charAt(0)==' ' || nextLine.charAt(0)=='\t') {
+						nextLine = nextLine.trim();
+						error.append("\nBlank Start Error on line "+lineCounter); // Error 2
 						errorLine = lineCounter;
+					}
+					if(isCode) {
+						if(nextLine.trim().toUpperCase().equals("DATA")) {
+							if(!(nextLine.trim().equals("DATA"))) {
+								error.append("\n \"DATA\" must be uppercase! Line: "+lineCounter); // Part of 3
+								errorLine = lineCounter;
+							}
+							isCode = false;
+						}
+						else {
+							codeLines.add(nextLine);
+						}
 					} else {
-						dataLines.add(nextLine);
+						if(nextLine.equals("DATA")) {
+							error.append("\nYou cannot have two lines with DATA: line "+lineCounter); // Error 3
+							errorLine = lineCounter;
+						} else {
+							dataLines.add(nextLine);
+						}
 					}
 				}
 			}
@@ -67,34 +69,64 @@ public class FullAssembler implements Assembler {
 				else 
 					s = dataLines.get(i);
 				String[] parts = s.trim().split("\\s+");
-				String word = parts[0].toUpperCase();
-				if(!parts[0].equals(word)) {
-					error.append("\nError on line " + (i+1) + ": mnemonic must be upper case");
-					errorLine = i+1;
-				}
-				if(!InstrMap.toCode.containsKey(parts[0])) {
-					error.append("\nError on line " + (i+1) + ": illegal mnemonic");
-					errorLine = i+1;
-				}
-				if(Assembler.noArgument.contains(parts[0])) {
-					if(parts.length!=1) {
-						error.append("\nError on line " + (i+1) + ": this mnemonic cannot take arguments");
+				if(isCode) {
+					String word = parts[0].toUpperCase();
+					if(!parts[0].equals(word)) {
+						error.append("\nError on line " + (i+1) + ": mnemonic must be upper case");
 						errorLine = i+1;
 					}
+					if(!InstrMap.toCode.containsKey(parts[0])) {
+						error.append("\nError on line " + (i+1) + ": illegal mnemonic");
+						errorLine = i+1;
+					}
+					if(Assembler.noArgument.contains(parts[0])) {
+						if(parts.length!=1) {
+							error.append("\nError on line " + (i+1) + ": this mnemonic cannot take arguments");
+							errorLine = i+1;
+						}
+					}
+					else {
+						if(parts.length<2) {
+							error.append("\nError on line " + (i+1) + ": this mnemonic is missing an argument");
+							errorLine = i+1;
+						}
+						else if(parts.length>2) {
+							error.append("\nError on line " + (i+1) + ": this mnemonic has too many arguments");
+							errorLine = i+1;
+						}
+						else {
+							int arg = Integer.parseInt(parts[1],16);
+						}
+					}
+					if(i==codeLines.size())
+						isCode = false;
 				}
 				else {
-					if(parts.length<2) {
-						error.append("\nError on line " + (i+1) + ": this mnemonic is missing an argument");
+					int address = Integer.parseInt(parts[0],16);
+					if(!InstrMap.toMnemonic.containsKey(address)) {
+						error.append("\nError on line "+(i+1)+": illegal code");
 						errorLine = i+1;
 					}
-					if(parts.length>2) {
-						error.append("\nError on line " + (i+1) + ": this mnemonic has too many arguments");
-						errorLine = i+1;
+					if(Assembler.noArgument.contains(InstrMap.toMnemonic.get(address))) {
+						if(parts.length!=1) {
+							error.append("\nError on line " + (i+1) + ": this code cannot take arguments");
+							errorLine = i+1;
+						}
+					}
+					else {
+						if(parts.length<2) {
+							error.append("\nError on line " + (i+1) + ": this code is missing an argument");
+							errorLine = i+1;
+						}
+						else if(parts.length>2) {
+							error.append("\nError on line " + (i+1) + ": this code has too many arguments");
+							errorLine = i+1;
+						}
+						else {
+							int value = Integer.parseInt(parts[1],16);
+						}
 					}
 				}
-				int arg = Integer.parseInt(parts[1],16);
-				int address = Integer.parseInt(parts[0],16);
-				int value = Integer.parseInt(parts[1],16);
 			} 
 			catch(NumberFormatException e) {
 				error.append("\nError on line " + (i+1) + ": argument is not a hex number");
