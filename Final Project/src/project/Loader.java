@@ -2,6 +2,7 @@ package project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /*
@@ -53,6 +54,9 @@ public class Loader {
 		}
 		catch(ArrayIndexOutOfBoundsException e) {
 			return "Array Index " + e.getMessage();
+		}
+		catch (NoSuchElementException e) {
+		   return "File " + file.getName() + " Does Not Exsist";
 		}
 		catch(FileNotFoundException e) {
 			return "File " + file.getName()+ " Not Found";
