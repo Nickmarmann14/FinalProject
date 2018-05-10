@@ -56,11 +56,11 @@ public class MachineModel{
 		});
 		//INSTRUCTION_MAP entry for "JMPR"
 		INSTRUCTIONS.put(0x6, arg -> {
-			cpu.instructionPointer=+arg;
+			cpu.instructionPointer+=arg;
 		});
 		//INSTRUCTION_MAP entry for "JUMP"
 		INSTRUCTIONS.put(0x7, arg -> {
-			cpu.instructionPointer=+(cpu.memoryBase+arg);
+			cpu.instructionPointer+= memory.getData(cpu.memoryBase+arg);
 		});
 		//INSTRUCTION_MAP entry for "JUMPI"
 		INSTRUCTIONS.put(0x8, arg -> {
@@ -69,15 +69,22 @@ public class MachineModel{
 		});
 		//INSTRUCTION_MAP entry for "JMPZR"
 		INSTRUCTIONS.put(0x9, arg -> {
-			cpu.instructionPointer=+arg;
-			if(cpu.accumulator!=0)
+			if(cpu.accumulator==0) {
+			cpu.instructionPointer+=arg;
+			}
+			else {
 				cpu.incrementIP();
+			}
 		});
 		//INSTRUCTION_MAP entry for "JMPZ"
 		INSTRUCTIONS.put(0xA, arg -> {
-			cpu.instructionPointer=+(cpu.memoryBase+arg);
-			if(cpu.accumulator!=0)
+			if(cpu.accumulator==0) {
+			cpu.instructionPointer+=memory.getData(cpu.memoryBase+arg);
+			}
+			else {
 				cpu.incrementIP();
+			}
+				
 		});
 		//INSTRUCTION_MAP entry for "JMPZI"
 		INSTRUCTIONS.put(0xB, arg -> {
@@ -152,18 +159,19 @@ public class MachineModel{
 		});
 		//INSTRUCTIONS_MAP entry for "DIV"
 		INSTRUCTIONS.put(0x16, arg -> {
-			if(arg == 0)
-				throw new DivideByZeroException("Cannot divide by zero");
 			int arg1 = memory.getData(cpu.memoryBase+arg);
+			if(arg1 == 0)
+				throw new DivideByZeroException("Cannot divide by zero");
 			cpu.accumulator /= arg1;
 			cpu.incrementIP();
 		});
 		//INSTRUCTIONS_MAP entry for "DIVN"
 		INSTRUCTIONS.put(0x17, arg -> {
-			if(arg == 0)
-				throw new DivideByZeroException("Cannot divide by zero");
+			
 			int arg1 = memory.getData(cpu.memoryBase+arg);
 			int arg2 = memory.getData(cpu.memoryBase+arg1);
+			if(arg2 == 0)
+				throw new DivideByZeroException("Cannot divide by zero");
 			cpu.accumulator /= arg2;
 			cpu.incrementIP();
 		});
@@ -274,7 +282,7 @@ public class MachineModel{
 	}
 
 	public void setJob(int i) {
-		if(i!=0 || i!=1){
+		if(i!=0 && i!=1){
 			throw new IllegalArgumentException("Input must be either 1 or 0!");
 		}
 		currentJob = jobs[i];
@@ -320,7 +328,7 @@ public class MachineModel{
 
 	public void clearJob() {
 		memory.clearData(currentJob.getStartmemoryIndex(), currentJob.getStartmemoryIndex()+Memory.DATA_SIZE/2);
-		memory.clear(currentJob.getStartmemoryIndex(), currentJob.getStartcodeIndex()+currentJob.getCodeSize());
+		memory.clear(currentJob.getStartcodeIndex(), currentJob.getStartcodeIndex()+currentJob.getCodeSize());
 		cpu.accumulator = 0;
 		cpu.instructionPointer = currentJob.getStartcodeIndex();
 		currentJob.reset();

@@ -29,8 +29,9 @@ public class ControlPanel implements Observer {
 		runButton.addActionListener(e -> view.toggleAutoStep());
 		panel.add(runButton);
 		reloadButton.addActionListener(e -> view.reload());
+		panel.add(reloadButton);
 		JSlider slider = new JSlider(5,1000);
-		slider.addChangeListener(e -> view.setPeriod(slider.getValue()));
+		slider.addChangeListener(e -> view.setPeriod(1001-slider.getValue()));
 		panel.add(slider);
 		return panel;
 	}

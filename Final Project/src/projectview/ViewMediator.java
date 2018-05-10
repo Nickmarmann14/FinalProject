@@ -155,10 +155,10 @@ public class ViewMediator extends Observable {
 			model.setCurrentState(States.AUTO_STEPPING);
 		} else{
 			model.setCurrentState(States.PROGRAM_LOADED_NOT_AUTOSTEPPING);
+		}
 			model.getCurrentState().enter();
 			setChanged();
 			notifyObservers();
-		}
 	}
 
 	public void reload(){
@@ -244,11 +244,13 @@ public class ViewMediator extends Observable {
 		if(currentState == States.PROGRAM_HALTED){
 			animator.setAutoStepOn(false);
 		}
+		
+		model.setCurrentState(currentState);
 		model.getCurrentState().enter();
 		setChanged();
 		notifyObservers();
 
-		model.setCurrentState(currentState);
+		
 	}
 
 	public void exit(){ // this will run when the user wants to leave

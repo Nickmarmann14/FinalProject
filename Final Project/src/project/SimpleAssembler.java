@@ -44,11 +44,15 @@ public class SimpleAssembler implements Assembler {
 				.map(line -> line.split("\\s+"))
 				.map(this::makeOutputCode) 
 				.collect(Collectors.toList());
+		List<String> outputData = lists.get(false).stream()
+				.map(line -> line.split("\\s+"))
+				.map(this::makeOutputData) 
+				.collect(Collectors.toList());
 		try (PrintWriter output = new PrintWriter(outputFileName)){
 			for(String s : outputCode) output.println(s);
 			output.println(-1); 
 			output.println(0);
-			for(String s : outputCode) output.println(s);
+			for(String s : outputData) output.println(s);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

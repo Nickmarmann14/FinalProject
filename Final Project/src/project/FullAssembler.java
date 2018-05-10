@@ -22,13 +22,13 @@ public class FullAssembler implements Assembler {
 				lineCounter++;
 				nextLine = sc.nextLine();
 				if(nextLine.trim().length()==0){
-					if(!(blankFound)) {
-						error.append("\nBlank Line Error on line"+ lineCounter); // Error 1
-						errorLine = lineCounter;
-					}
 					blankFound = true;
 				}
 				else {
+					if(blankFound) {
+						error.append("\nBlank Line Error on line"+ (lineCounter-1)); // Error 1
+						errorLine = lineCounter;
+					}
 					if(nextLine.charAt(0)==' ' || nextLine.charAt(0)=='\t') {
 						nextLine = nextLine.trim();
 						error.append("\nBlank Start Error on line "+lineCounter); // Error 2
@@ -63,75 +63,81 @@ public class FullAssembler implements Assembler {
 		isCode = true;
 		String s;
 		for(int i = 0; i< codeLines.size()+dataLines.size(); i++) {
-			try {
-				if(i<codeLines.size())
-					s = codeLines.get(i);
-				else 
-					s = dataLines.get(i);
-				String[] parts = s.trim().split("\\s+");
-				if(isCode) {
-					String word = parts[0].toUpperCase();
-					if(!parts[0].equals(word)) {
-						error.append("\nError on line " + (i+1) + ": mnemonic must be upper case");
+			if(i<codeLines.size())
+				s = codeLines.get(i);
+			else 
+				s = dataLines.get(i-codeLines.size());
+			String[] parts = s.trim().split("\\s+");
+			if(i==codeLines.size())
+					isCode = false;
+			if(isCode) {
+				String word = parts[0].toUpperCase();
+				if(!parts[0].equals(word)) {
+					error.append("\nError on line " + (i+1) + ": mnemonic must be upper case");
+					errorLine = i+1;
+				}
+				if(!InstrMap.toCode.containsKey(parts[0])) {
+					error.append("\nError on line " + (i+1) + ": illegal mnemonic");
+					errorLine = i+1;
+				}
+				if(Assembler.noArgument.contains(parts[0])) {
+					if(parts.length!=1) {
+						error.append("\nError on line " + (i+1) + ": this mnemonic cannot take arguments");
 						errorLine = i+1;
 					}
-					if(!InstrMap.toCode.containsKey(parts[0])) {
-						error.append("\nError on line " + (i+1) + ": illegal mnemonic");
-						errorLine = i+1;
-					}
-					if(Assembler.noArgument.contains(parts[0])) {
-						if(parts.length!=1) {
-							error.append("\nError on line " + (i+1) + ": this mnemonic cannot take arguments");
-							errorLine = i+1;
-						}
-					}
-					else {
-						if(parts.length<2) {
-							error.append("\nError on line " + (i+1) + ": this mnemonic is missing an argument");
-							errorLine = i+1;
-						}
-						else if(parts.length>2) {
-							error.append("\nError on line " + (i+1) + ": this mnemonic has too many arguments");
-							errorLine = i+1;
-						}
-						else {
-							int arg = Integer.parseInt(parts[1],16);
-						}
-					}
-					if(i==codeLines.size())
-						isCode = false;
 				}
 				else {
-					int address = Integer.parseInt(parts[0],16);
-					if(!InstrMap.toMnemonic.containsKey(address)) {
-						error.append("\nError on line "+(i+1)+": illegal code");
+					if(parts.length<2) {
+						error.append("\nError on line " + (i+1) + ": this mnemonic is missing an argument");
 						errorLine = i+1;
 					}
-					if(Assembler.noArgument.contains(InstrMap.toMnemonic.get(address))) {
-						if(parts.length!=1) {
-							error.append("\nError on line " + (i+1) + ": this code cannot take arguments");
-							errorLine = i+1;
-						}
+					else if(parts.length>2) {
+						error.append("\nError on line " + (i+1) + ": this mnemonic has too many arguments");
+						errorLine = i+1;
 					}
 					else {
-						if(parts.length<2) {
-							error.append("\nError on line " + (i+1) + ": this code is missing an argument");
-							errorLine = i+1;
-						}
-						else if(parts.length>2) {
-							error.append("\nError on line " + (i+1) + ": this code has too many arguments");
-							errorLine = i+1;
-						}
-						else {
-							int value = Integer.parseInt(parts[1],16);
+						try {int arg = Integer.parseInt(parts[1],16);}
+						catch(NumberFormatException e) {
+							error.append("\nError on line " + (i+1) + ": argument is not a hex number");
+							errorLine = i+1;				
 						}
 					}
 				}
-			} 
-			catch(NumberFormatException e) {
-				error.append("\nError on line " + (i+1) + ": argument is not a hex number");
-				errorLine = i+1;				
+		
+			}
+			//data parsed here
+			else {
+				if(parts.length<2) {
+					error.append("\nError on line " + (i+2) + ": data has too few values");
+					errorLine = i+1;
+				}
+				else if(parts.length>2) {
+					error.append("\nError on line " + (i+2) + ": data has too many value");
+					errorLine = i+1;
+				}
+				else {
+					try{
+						Integer.parseInt(parts[0],16);
+					}
+					catch(NumberFormatException e) {
+						error.append("\nError on line " + (i+2) + ": data has non-numeric memory address");
+						errorLine = i+1;
+					}
+					if(parts.length > 1) {
+						try{
+							Integer.parseInt(parts[1],16);
+						}
+						catch(NumberFormatException e) {
+							error.append("\nError on line " + (i+2) + ": data has non-numeric memory value");
+							errorLine = i+1;
+						}
+					}
+				}
 			}	
+		}
+		if(errorLine==0) {
+			SimpleAssembler assemblr = new SimpleAssembler();
+			assemblr.assemble(inputFileName, outputFileName, error);
 		}
 		return errorLine;
 	}
